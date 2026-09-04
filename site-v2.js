@@ -229,6 +229,17 @@ const content={
 
 const modal=document.querySelector('#modal');
 const cursorHome=cursor.parentElement;   // remember original parent (body)
+let pageScrollY=0;
+const lockPageScroll=()=>{
+  pageScrollY=window.scrollY;
+  document.body.classList.add('modal-open');
+  document.body.style.top=`-${pageScrollY}px`;
+};
+const unlockPageScroll=()=>{
+  document.body.classList.remove('modal-open');
+  document.body.style.top='';
+  window.scrollTo(0,pageScrollY);
+};
 document.querySelectorAll('.project-card').forEach(card=>card.addEventListener('click',()=>{
   const d=content[card.dataset.project];
   if(!d)return;
@@ -237,6 +248,7 @@ document.querySelectorAll('.project-card').forEach(card=>card.addEventListener('
   document.querySelector('#modalNo').textContent=d.no;
   document.querySelector('#modalTitle').textContent=d.title;
   document.querySelector('#modalBody').innerHTML=d.body;
+  lockPageScroll();
   modal.showModal();
   // Move cursor into the dialog so it joins the top layer and stays visible
   modal.append(cursor);
@@ -246,6 +258,7 @@ modal.addEventListener('click',e=>{if(e.target===modal)modal.close()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&modal.open)modal.close()});
 // Return cursor to normal document flow when modal closes
 modal.addEventListener('close',()=>{
+  unlockPageScroll();
   cursorHome.append(cursor);
   cursor.style.background='var(--r)';
 });
@@ -292,6 +305,7 @@ document.querySelectorAll('.experience-list article').forEach((article,index)=>{
     experienceModalRole.textContent=article.querySelector('.exp-role-sub')?.textContent||'';
     experienceModalLead.innerHTML=article.querySelector('.exp-lead')?.innerHTML||'';
     experienceModalDetails.innerHTML=`${details.outerHTML}${tags.outerHTML}`;
+    lockPageScroll();
     experienceModal.showModal();
     experienceModal.append(cursor);
     cursor.classList.add('modal-cursor');
@@ -306,6 +320,7 @@ document.querySelectorAll('.experience-list article').forEach((article,index)=>{
 document.querySelector('.experience-close')?.addEventListener('click',()=>experienceModal?.close());
 experienceModal?.addEventListener('click',event=>{if(event.target===experienceModal)experienceModal.close()});
 experienceModal?.addEventListener('close',()=>{
+  unlockPageScroll();
   cursorHome.append(cursor);
   cursor.classList.remove('modal-cursor');
   cursor.style.background='var(--r)';
